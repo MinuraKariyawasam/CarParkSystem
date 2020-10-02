@@ -1,11 +1,20 @@
 package com.IIT;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class WestminsterCarParkManager implements CarParkManager{
+    private int carCount;
+    private int vanCount;
+    private int motorbikeCount;
+    private int timeDifference;
+    private double parkingCharges;
 
     List<Vehical> vehiclesInformation = new ArrayList<>(20);
+    LocalTime currentTime = LocalTime.now();
+    int currentDate = LocalDate.now().getDayOfMonth();
 
     @Override
     public void addNewVehicle(Vehical newVehicle) {
@@ -39,7 +48,7 @@ public class WestminsterCarParkManager implements CarParkManager{
 
         }
 
-        if (!IsVehicleInList){ System.out.println("ID number" + idPlate + " not in the system."); }
+        if (!IsVehicleInList){ System.out.println("ID number " + idPlate + " not in the system."); }
     }
 
     @Override
@@ -49,6 +58,21 @@ public class WestminsterCarParkManager implements CarParkManager{
 
     @Override
     public void vehiclePercentage() {
+
+        for(Vehical vehicleCount : vehiclesInformation){
+            if (vehicleCount instanceof car){ carCount = carCount + 1; }
+            else if (vehicleCount instanceof Van){ vanCount = vanCount + 1; }
+            else { motorbikeCount = motorbikeCount + 1; }
+        }
+
+        // get the percentage
+        double carPercentage = (carCount/vehiclesInformation.size()) * 100;
+        double vanPercentage = (vanCount/vehiclesInformation.size()) * 100;
+        double motorbikePercentage = (motorbikeCount/vehiclesInformation.size()) * 100;
+
+        System.out.println("Car percentage: " + carPercentage);
+        System.out.println("Van percentage: " + vanPercentage);
+        System.out.println("Motorbike percentage: " + motorbikePercentage);
 
     }
 
@@ -78,6 +102,24 @@ public class WestminsterCarParkManager implements CarParkManager{
 
     @Override
     public void vehicleCharge() {
+        boolean isVehicleInThisDate = false;
 
+        for (Vehical vehicleDate : vehiclesInformation){
+
+            if (vehicleDate.getDatetime().getDay() == currentDate){
+                isVehicleInThisDate = true;
+                timeDifference = (currentTime.getHour() - vehicleDate.getDatetime().getHour());
+                break;
+            }
+        }
+
+        if (timeDifference <= 3){ parkingCharges = 3 * timeDifference;}
+        else { parkingCharges = 9 + (timeDifference - 3); }
+
+        if (!isVehicleInThisDate){ System.out.println("There are no vehicle at that day."); }
+
+        for (Vehical parkingVehicle : vehiclesInformation){
+            System.out.println("ID plate: " + parkingVehicle.getIdPlate() + " final price: " + parkingCharges);
+        }
     }
 }
